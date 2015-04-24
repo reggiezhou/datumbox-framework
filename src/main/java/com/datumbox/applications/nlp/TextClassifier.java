@@ -29,6 +29,7 @@ import com.datumbox.framework.utilities.text.cleaners.StringCleaner;
 import com.datumbox.framework.utilities.text.extractors.TextExtractor;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -95,10 +96,20 @@ public class TextClassifier extends BaseWrapper<TextClassifier.ModelParameters, 
         knowledgeBase.save();
     }
     
-    public void fit(Map<Object, URI> datasets, TrainingParameters trainingParameters) { 
+    public void fitByURI(Map<Object, URI> datasets, TrainingParameters trainingParameters) { 
         //build trainingDataset
         TextExtractor textExtractor = TextExtractor.newInstance(trainingParameters.getTextExtractorClass(), trainingParameters.getTextExtractorTrainingParameters());
         Dataset trainingData = Dataset.Builder.parseTextFiles(datasets, textExtractor, knowledgeBase.getDbConf());
+        
+        fit(trainingData, trainingParameters);
+        
+        trainingData.erase();
+    }
+    
+    public void fitByList(Map<Object, List<String>> datasets, TrainingParameters trainingParameters) { 
+        //build trainingDataset
+        TextExtractor textExtractor = TextExtractor.newInstance(trainingParameters.getTextExtractorClass(), trainingParameters.getTextExtractorTrainingParameters());
+        Dataset trainingData = Dataset.Builder.parseStringList(datasets, textExtractor, knowledgeBase.getDbConf());
         
         fit(trainingData, trainingParameters);
         
